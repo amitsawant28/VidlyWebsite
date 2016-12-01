@@ -1,0 +1,207 @@
+﻿@model Vidly.Models.Rental
+@{
+    ViewBag.Title = "New Rental Form";
+    //Layout = "~/Views/Shared/AdminHomePage.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>New Rental Form</h2>
+<form id="newRental">
+
+   <div class="form-group">
+       <label for="customer">Customer</label>
+        <div class="tt-container">
+            <input type="text" id="customer" name="customer" class="form-control" required />
+        </div>
+    </div>
+    @*<div>
+        <label for="customer1">Customer1</label>
+        <input type="text" value="" name="customer1" required />
+    </div>*@
+    
+
+    <div class="form-group">
+        <label for="movie">Movie</label>
+        <div class="tt-container">
+            <input type="text" id="movie" name="movie" value="" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 col-sm-4">
+            <ul id="movies" class="list-group"></ul>
+        </div>
+    </div>
+
+    <button type="submit" id="submitButton" class="btn btn-primary">Submit</button>
+
+</form>
+
+
+
+@section scripts
+{
+
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/scripts/1typeaheadscript.js")
+    <script>
+        //I observed that $.validate() doesn't work properly with DOM pattern
+        //So I preferred JS Module pattern of (funtion($){}(jquery);)
+
+        //$(document).ready(function () { //DOM Ready pattern
+        //(function($){});(jquery); //The JavaScript Module Pattern
+        //Modules vs DOMReady In Backbone Apps
+        //It’s bad form to define your Backbone code inside of jQuery’s DOMReady function,
+        //and potentially damaging to your application performance. 
+        //This function does not get called until the DOM has loaded and is ready to be manipulated. 
+        //That means you’re waiting until the browser has parsed the DOM at least once before you are defining your objects.
+
+        //It’s a better idea to define your Backbone objects outside of a DOMReady function. I, among many others, prefer to do this inside of a JavaScript Module pattern so that I can provide encapsulation and privacy for my code. 
+        //I tend to use the “Revealing Module” pattern to provide access to the bits that I need outside of my module.
+        (function ($) {
+
+                    $.validator.addMethod("validCustomer", function () {
+                        return vm.customerId && vm.customerId !== 0;
+                    }, "Please select a valid customer.");
+
+                    $.validator.addMethod("atLeastOneMovie", function () {
+                        return vm.movieIds.length > 0;
+                    }, "Please select at least one movie.");
+
+                    var validator = $("#newRental").validate({
+                        rules: {
+                            customer: { required: true },
+                            //movie: { required: true }
+                        },
+                        messages: {
+                            customer: { required: "Please enter valid customer name." },
+                            //movie: { required: "Enter valid data." },
+                        },
+                        submitHandler: function () {
+                            $.ajax({
+                                url: "/api/newRentals",
+                                method: "post",
+                                data: vm
+                            })
+                            .done(function () {
+                                toastr.options.closeButton = true;
+                                toastr.success("Rentals successfully recorded.");
+                                
+
+                                $("#customer").typeahead("val", "");
+                                $("#movie").typeahead("val", "");
+                                $("#movies").empty();
+
+                                vm = { movieIds: [] };
+
+                                validator.resetForm();
+                            })
+                            .fail(function () {
+                               
+                                toastr.options.closeButton = true;
+                                toastr.options.positionClass = 'toast-top-right';
+                                //toastr.options.timeOut = 0;                                
+                                //toastr.optionsOverride = 'positionClass="toast-custom-width"';
+                               /* toastr.options = {
+                                    positionClass: "toast-"
+                                };
+                                */
+                                //toastr.options.preventDuplicates = true;
+                                toastr.error("Please enter valid data.");
+                            });
+
+                            return false; //Prevents the form from being
+                                          //submitted normally
+                        }
+
+            }); //End of validate function
+        })(jQuery); //End of module pattern
+                     
+    </script>
+
+}
+
+
+@*
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+    @Scripts.Render("~/scripts/1typeaheadscript.js")
+    
+    <script>
+        $(document).ready(function () {
+            $("#newRental").validate();
+        });
+
+         /*   var $form = $(this);
+            var requestOK = false;
+
+            $("#newRental").validate({
+                rules: {
+                    customer: { required: true },
+                    movie: { required: true }
+                },
+                messages:{
+                    customer:{required: "Enter valid data."},
+                    movie:{required: "Enter valid data."},
+                }, 
+                submitHandler: function ($form) {
+                    var formData = $("#newRental").serialize();
+                    $.ajax({
+                        url: "/api/newRentals",
+                        method: "POST",
+                        data: formData,
+                        success: function (data) {
+                            console.log(data)
+                        },
+                        error: function (err) {
+                            console.log(err)
+                        }
+
+
+                    })
+
+                    .done(function () {
+                        console.log("success");
+                        toastr.success("Rentals succesfully recorded.");
+                    })
+                    .fail(function () {
+                        console.log("failed");
+                        toastr.error("Something went wrong");
+                    });
+                  }
+            }); */
+
+              //extra
+                 
+            /*
+            if ($("#newRental").valid())
+                {
+                    $("#newRental").submit(function (e) {
+                        e.preventDefault();
+                        $.ajax({
+                            url: "/api/newRentals",
+                            method: "POST",
+                            data: vm
+                        })
+                        .done(function () {
+                            console.log("success");
+                            toastr.success("Rentals succesfully recorded.");
+                        })
+                        .fail(function () {
+                            console.log("failed");
+                            toastr.error("Something went wrong");
+                        });
+                    })
+                }
+              */      
+                    
+                    
+             //   });
+
+          //  });
+        
+    </script>
+}
+*@

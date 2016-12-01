@@ -1,0 +1,92 @@
+﻿@model IEnumerable<Vidly.Models.Customer>
+@*@model IEnumerable<Vidly.ViewModels.VidlyViewModel>*@
+
+ @*
+         Note: I've set the model for this view to IEnumerable<Customer>.
+         This is a simple interface implemented by the list class. Since
+         in this view we only want to iterate over this list, and we don't
+         need any of the operations in the List class (eg Add, Remove, etc),
+         it's better to use the IEnumerable interface, which allows use to
+         iterate over the list. If in the future, we replace the List with a
+         different data structure, as long as it is enumerable, our view code
+         will remain unchanged.
+     *@
+ 
+ @{
+     ViewBag.Title = "Customers";
+     Layout = "~/Views/Shared/AdminHomePage.cshtml";
+ }
+ 
+ <h2>Customers</h2>
+ 
+    <table id="customers" class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Membership Type</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody>
+            @*@foreach (var customer in Model)
+                {
+                    <tr>
+                        <td>@Html.ActionLink(customer.Name, "Edit", "Customers", new { id = customer.Id }, null)</td>
+                        <td>@customer.MembershipType.DiscountRate%</td>
+                        <td>
+                            <button data-customer-id="@customer.Id" class="btn-link js-delete">Delete</button>
+                        </td>
+                    </tr>
+                }*@
+        </tbody>
+    </table>
+
+@section scripts
+{
+    <script> //Write carefully without any mistakes in camelCasing only
+        $(document).ready(function () {
+           var table = $("#customers").DataTable({
+                ajax: {
+                    url: "/api/customers",
+                    dataSrc: ""
+                },
+                columns: [
+                    {//1st column Customer Name
+                        data: "name",
+                        render: function (data, type, customer) {
+                            return "<a href='/customers/edit/" + customer.id + "'>" + customer.name + "</a>";
+                        }
+                    },
+                    {//2nd column Membership Type
+                        data:"membershipType.name",
+                    },
+                    {//3rd column Customer Id to delete customer
+                        data: "id",
+                        render: function (data) {
+                            return "<button class = 'btn-link js-delete' data-customer-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+
+            });
+
+            $("#customers").on("click", ".js-delete", function () {
+                var button = $(this);
+
+                bootbox.confirm("Are you sure want to delete this customer?", function (result) {
+                    if(result) //If result has truthy value i.e NotNull/Undefined
+                    { //If true then we call our API using jQuery AJAX
+                        $.ajax({
+                            url: "/api/customers/" + button.attr("data-customer-id"),
+                            method: "DELETE",
+                            success: function () {
+                               table.row(button.parents("tr")).remove().draw();
+                            }
+                        });
+                    }
+                });
+            });
+        });
+
+    </script>
+}

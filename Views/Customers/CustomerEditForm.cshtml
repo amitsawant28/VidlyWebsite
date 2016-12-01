@@ -1,0 +1,98 @@
+﻿@model Vidly.ViewModels.CustomerFormViewModel
+
+@{
+    ViewBag.Title = "Edit Customer";
+    Layout = "~/Views/Shared/AdminHomePage.cshtml";
+}
+
+<h2>Edit Customer</h2>
+
+@*BeginForm("Save","Customers",FormMethod.Post)*@
+@using (Html.BeginForm("Save", "Customers"))
+
+{
+  <div id="Customer-Form">
+       @Html.ValidationSummary(true, "Please correct the following errors.")
+       <div class="form-group">
+           @Html.LabelFor(m=>m.Customer.Name)
+           @Html.TextBoxFor(m => m.Customer.Name, new { @class = "form-control" })
+           @Html.ValidationMessageFor(m => m.Customer.Name)
+       </div>
+
+       <div class="form-group">
+           @Html.LabelFor(m => m.Customer.MembershipTypeId)
+           @Html.DropDownListFor(m => m.Customer.MembershipTypeId, new SelectList(Model.MembershipTypes, "Id", "Name"), "Select Membership Type", new { @class = "form-control" })
+           @Html.ValidationMessageFor(m => m.Customer.MembershipTypeId)
+       </div>
+
+       <div class="form-group">
+           @Html.LabelFor(m => m.Customer.BirthDate)
+           @Html.TextBoxFor(m => m.Customer.BirthDate, "{0:d MMM yyyy}", new { @class = "form-control" })
+           @Html.ValidationMessageFor(m => m.Customer.BirthDate)
+
+       </div>
+
+       <div class="checkbox">
+           <label>
+               @Html.CheckBoxFor(m => m.Customer.IsSubscribedToNewsLetter)Subscribed To NewsLetter?
+           </label>
+       </div>
+
+       @Html.HiddenFor(m => m.Customer.Id)
+       @Html.AntiForgeryToken()
+       <button type="submit" class="btn btn-primary">Save</button>
+
+     <div id="ListOfMovies">
+         <label class="Label1">Movies rented by User:</label>
+         <ul>
+             @foreach (var movie in Model.MoviesList)
+             {
+                 <li>@movie.movie.Name</li>
+             }
+         </ul>
+     </div>
+
+
+   </div> //End of Customer-Form Div
+
+    
+
+
+}
+
+
+   @* <div id="ListOfMovies">
+        <ul>
+            @foreach (var movie in Model.ListOfMovies)
+            {
+                <li>movie.ListOfMovies</li>
+            }
+        </ul>
+    </div> *@
+
+    @*<div id="1ListOfMovies">
+        @foreach (var movie in Model.MoviesList)
+        {
+            if (Model.MoviesList)
+                <ul>
+                    <li>
+                        @foreach (var m in movie.movie)
+                        {
+                           
+                            @* @m.ToString(); *@
+
+                  @*<table>
+                    <tr>
+                        <td>
+                            @m.ToString();
+                        </td>
+                    </tr>
+                </table>*@
+            
+
+
+
+@section scripts
+{
+    @Scripts.Render("~/bundles/jqueryval")
+}

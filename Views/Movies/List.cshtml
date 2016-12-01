@@ -1,0 +1,106 @@
+﻿@model IEnumerable<Vidly.Models.Movie>
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/AdminHomePage.cshtml";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Movies</h2>
+<p>
+    @Html.ActionLink("New Movie", "New", "Movies", null, new { @class = "btn btn-primary" })
+</p>
+<table id="movies" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Genre</th>
+            <th>Delete</th>
+        </tr>
+    </thead>
+    
+    <tbody>
+        @*@foreach (var movie in Model)
+        {
+         <tr>
+
+           <td>@Html.ActionLink(movie.Name, "Edit", "Movies", new { id = movie.Id }, null)</td>
+           <td>@movie.Genre.Name</td>
+           <td>
+               <button class="btn-link js-delete" data-movie-id="@movie.Id">Delete</button>
+           </td>
+         </tr>
+        }*@
+         
+    </tbody>
+
+</table>
+
+@section scripts
+{
+    <script>
+        $(document).ready(function () {
+           var table = $("#movies").DataTable({
+                ajax: {
+                    url: "/api/movies",
+                    dataSrc: ""
+                },
+                columns: [
+                    {//1st column Movie Name
+                        data: "Genre.name",
+                        render: function (data, type, movie) {
+                            return "<a href='/movies/edit/" + movie.id + "'>" + movie.name + "</a>";
+                        }
+                    },
+                    {//2nd column Genre
+                        data: "name"//"genre.name"
+                    },
+                    {//3rd column Movie Id to delete movie
+                        data: "id",
+                        render: function (data) {
+                            return "<button class='btn-link js-delete' data-movie-id=" + data + ">Delete</button>";
+                        }
+                    }
+                ]
+            });
+
+            //on Click jQuery Event handler
+           $("#movies").on("click", ".js-delete", function () {
+               var button = $(this);
+
+               bootbox.confirm("Are you sure want to delete this movie?", function (result) {
+                   if (result)  //If result has truthy value i.e not Null/Undefined
+                   {            //If true then we call our API using jQuery AJAX request
+                       $.ajax({
+                           url: "/api/movies/" + button.attr("data-movie-id"),
+                           method: "DELETE",
+                           success: function () {
+                              table.row(button.parents("tr")).remove().draw();
+                           }
+                       });
+                   }
+               });           
+            });
+        });
+
+    </script>
+}
+
+
+
+            @*Sample click event handler for debug reference with log message
+             $("#movies").on("click", ".js-delete", function () {
+               var button = $(this);
+
+               confirm("Are you sure want to delete this movie?")
+                {  //If true then we call our API using jQuery AJAX request
+                   $.ajax({
+                       url: "/api/movies/" + button.attr("data-movie-id"),
+                       method: "DELETE",
+                       success: function () {
+                           console.log("success");
+                           //table.row(button.parents("tr")).remove().draw();
+                       }
+                   });
+               }
+
+            });*@

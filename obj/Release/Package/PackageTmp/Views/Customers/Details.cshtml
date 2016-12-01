@@ -1,0 +1,42 @@
+﻿@model Vidly.Models.Customer
+
+@{
+    ViewBag.Title = "Customer Details"; //Model.Name ;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@*<h2>@Model.Name</h2>*@
+<h2>Customer Details</h2>
+ <ul>
+    <li><h3>Membership Type:</h3> @Model.MembershipType.Name</li>
+
+        @if (Model.BirthDate.HasValue)
+        {
+            <li><h3>Birthdate:</h3> @Model.BirthDate.Value.ToShortDateString()</li>
+        }  
+ </ul>
+
+
+@*
+<table align="left" id="ListOfMovies" class="table table-bordered table-hover">
+    <thead>
+        <tr>
+            <th>List Of Rented Movies</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @* @foreach (var movie in Model)
+            {
+                <tr>
+                    <td>@Html.ActionLink(movie.Movies.Name, "Edit", "Movies", new { id = movie.Movies.Id }, null)</td>
+                    @*<td>@movie.Movies.Genre.Name</td>
+                        <td>
+                            <button class="btn-link js-delete" data-movie-id="@movie.Id">Delete</button>
+                        </td>
+                </tr>
+            } 
+    </tbody>
+</table>
+
+*@
